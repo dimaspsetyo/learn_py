@@ -1,0 +1,360 @@
+import numpy as np
+
+# mendefinisikan array yang akan digunakan
+playlist = ([])
+
+# membuat tampilan menu
+# push, edit, sort, pop, show, search, exit.
+
+
+def spotiplay(playlist):
+    while True:
+        try:
+            print("""\nSPOTIPLAY MENU
+      1. Masukkan lagu ke dalam Playlist.
+      2. Ubah lagu pada Playlist.
+      3. Urutkan lagu pada Playlist.
+      4. Mainkan lagu pada Playlist.
+      5. Tampilkan lagu pada Playlist.
+      6. Cari lagu pada Playlist.
+      7. Hapus isi Playlist.
+      8. Keluar.""")
+            menu = int(input("Pilih Menu : "))
+            if menu == 1:
+                insertSong(playlist)
+            elif menu == 2:
+                updatePlaylist(playlist)
+            elif menu == 3:
+                sortPlaylist(playlist)
+            elif menu == 4:
+                playSong(playlist)
+            elif menu == 5:
+                showPlaylist(playlist)
+            elif menu == 6:
+                findSong(playlist)
+            elif menu == 7:
+                removePlaylist(playlist)
+            elif menu == 8:
+                exitSpotipai()
+            else:
+                invalid()
+        except ValueError:
+            invalid()
+
+# membuat function yang digunakan pada menu
+
+# function pertama untuk menambahkan lagu ke dalam Playlist
+# dengan menggunakan push
+
+
+def insertSong(playlist):
+    if playlist == ([]):
+        print("Masukkan jumlah lagu yang ingin ditambahkan : ")
+        songs = int(input("(Kapasitas Playlist 20) : "))
+        if songs < 1 or songs > 20:
+            insufficient()
+        else:
+            push(playlist, songs)
+    else:
+        print("Playlist telah terisi, ingin tetap menambah lagu?")
+        answer = str(input("Jawab (Y/T) : "))
+        if answer == "Y" or answer == 'y':
+            print("Masukkan jumlah lagu yang ingin ditambahkan : ")
+            songs = int(input("(Kapasitas Playlist 20) : "))
+            add = len(playlist) + songs
+            if add < 1 or add > 20:
+                insufficient()
+            else:
+                push(playlist, songs)
+        elif answer == "T" or answer == 't':
+            cancel()
+        else:
+            invalid()
+
+# function kedua untuk mengubah isi playlist
+# dengan mengubah nama lagu pada suatu indeks
+
+
+def updatePlaylist(playlist):
+    content = len(playlist)
+    if content != 0:
+        for x in range(content):
+            print("Lagu pada posisi-", x, " =", playlist[x])
+
+        edit = int(input("Masukkan posisi lagu yang ingin diedit : "))
+        if edit in range(content):
+            edited = str(input("Masukkan nama lagu baru : "))
+            playlist[edit] = edited
+            success()
+            print("Lagu pada posisi-", x, " berhasil diubah.")
+            returnMenu()
+        else:
+            unregistered()
+    else:
+        emptyPlaylist()
+
+# function ketiga untuk mengurutkan posisi lagu secara alphabetical
+
+
+def sortPlaylist(playlist):
+    content = len(playlist)
+    if content != 0:
+        sorting = []
+        for x in range(content):
+            sorting.append(playlist[x])
+
+        sortinteger = []
+        sortstring = []
+
+        for pisah in sorting:
+            if isinstance(pisah, int):
+                sortinteger.append(pisah)
+            else:
+                sortstring.append(pisah)
+
+        mergeSort(sortinteger)
+        mergeSort(sortstring)
+
+        sorting = sortinteger + sortstring
+        success()
+        for x in range(content):
+            print("Lagu pada posisi-", x, " =", sorting[x])
+
+        returnMenu()
+    else:
+        emptyPlaylist()
+
+# function mergeSort untuk mengurutkan lagu dan menerapkan recursion di dalamnya
+# function ini digunakan pada function sortPlaylist
+
+
+def mergeSort(sorting):
+    if len(sorting) > 1:
+
+        r = len(sorting)//2
+        L = sorting[:r]
+        M = sorting[r:]
+
+        mergeSort(L)
+        mergeSort(M)
+
+        i = j = k = 0
+
+        while i < len(L) and j < len(M):
+            if L[i] < M[j]:
+                sorting[k] = L[i]
+                i += 1
+            else:
+                sorting[k] = M[j]
+                j += 1
+            k += 1
+
+        while i < len(L):
+            sorting[k] = L[i]
+            i += 1
+            k += 1
+
+        while j < len(M):
+            sorting[k] = M[j]
+            j += 1
+            k += 1
+
+
+# function keempat untuk memainkan lagu,
+# lalu menghapusnya dari playlist setelah dimainkan
+def playSong(playlist):
+    content = len(playlist)
+    if content != 0:
+        print("""Pilih :
+        1. Mainkan lagu dari posisi awal.
+        2. Mainkan lagu dari posisi terakhir.""")
+        answer = int(input("Pilih (1/2) : "))
+        if answer == 1:
+            dequeue(playlist)
+            return playlist
+        elif answer == 2:
+            stackPop(playlist)
+            return playlist
+        else:
+            invalid()
+    else:
+        emptyPlaylist()
+
+# function kelima untuk menampilkan lagu di dalam Playlist
+# bisa dengan mengurutkan posisi berdasarkan alphabetical
+
+
+def showPlaylist(playlist):
+    content = len(playlist)
+    if content != 0:
+        print("Tampilkan lagu dalam posisi berurutan ? ")
+        answer = str(input("Jawab (Y/T) : "))
+        if answer == "Y" or answer == 'y':
+            success()
+            sortPlaylist(playlist)
+        elif answer == "T" or answer == 't':
+            success()
+            for x in range(content):
+                print("Lagu pada posisi-", x, " =", playlist[x])
+            returnMenu()
+        else:
+            invalid()
+    else:
+        emptyPlaylist()
+
+# function keenam untuk mencari lagu pada Playlist
+# dengan menggunakan binary search
+
+
+def findSong(playlist):
+    content = len(playlist)
+    if content != 0:
+        binarySearch(playlist, search=str(
+            input("Masukkan nama lagu yang ingin dicari : ")))
+    else:
+        emptyPlaylist()
+
+# function ketujuh untuk menghapus isi seluruh playlist
+
+
+def removePlaylist(playlist):
+    content = len(playlist)
+    if content != 0:
+        print("Hapus isi Playlist ? ")
+        answer = str(input("Jawab (Y/T) : "))
+        if answer == "Y" or answer == 'y':
+            for x in range(content):
+                playlist.pop(0)
+            success()
+            return playlist
+        elif answer == "T" or answer == 't':
+            cancel()
+        else:
+            invalid()
+    else:
+        emptyPlaylist()
+
+# function kedelapan untuk mengakhiri program
+
+
+def exitSpotipai():
+    print("Keluar dari program ? ")
+    answer = str(input("(Y/T) : "))
+    if answer == "Y" or answer == 'y':
+        success()
+        print("Mematikan program.")
+        exit()
+    elif answer == "T" or answer == 't':
+        cancel()
+    else:
+        invalid()
+
+# function push untuk menambahkan value pada array
+
+
+def push(playlist, songs):
+    for x in range(songs):
+        playlist.append(str(input("Masukkan nama lagu : ")))
+    print(playlist)
+    playlist = np.array(playlist)
+    success()
+    return playlist
+
+# function dequeue untuk menghapus value pada indeks awal array
+
+
+def dequeue(playlist):
+    success()
+    print("Memainkan lagu pada posisi awal.")
+    playlist.pop(0)
+
+    returnMenu()
+
+# function pop untuk menghapus value pada indeks akhir array
+
+
+def stackPop(playlist):
+    success()
+    print("Memainkan lagu pada posisi akhir.")
+    playlist.pop()
+    returnMenu()
+
+# function binarySearch untuk mencari nilai array
+# dengan menerapkan binary search
+
+
+def binarySearch(playlist, search):
+    start = 0
+    end = len(playlist) - 1
+    result = False
+
+    while start <= end and not result:
+        mid = (start + end) // 2
+        if(playlist[mid] == search):
+            result = True
+            print("Lagu", search, "berada pada posisi ke-", mid)
+            returnMenu()
+        else:
+            if(search < playlist[mid]):
+                end = mid + 1
+            else:
+                start = mid + 1
+    if result is False:
+        unregistered()
+
+
+# function insufficient sebagai error status
+# bila value yang dimasukkan melebihi size array
+
+
+def insufficient():
+    print("\nError :\nKapasitas Playlist tidak memadai.")
+    cancel()
+
+# function emptyPlaylist sebagai error status
+# bila array belum memiliki value
+
+
+def emptyPlaylist():
+    print("\nError :\nPlaylist belum memiliki isi. Silahkan isi pada Menu 1 !")
+    cancel()
+
+# function unregistered sebagai error status
+# bila value yang dicari tidak ada pada array
+
+
+def unregistered():
+    print("\nError :\nLagu tidak terdaftar.")
+    cancel()
+
+# function success sebagai pemberitahuan
+# bila perintah berhasil dieksekusi
+
+
+def success():
+    print("\nPerintah berhasil dijalankan.")
+
+# function cancel sebagai pemberitahuan
+# bila perintah gagal dieksekusi
+
+
+def cancel():
+    print("\nPerintah dibatalkan.")
+    returnMenu()
+
+# function invalid sebagai error status
+# bila perintah yang dimasukkan tidak valid
+
+
+def invalid():
+    print("\nError:\nInput tidak valid. Masukkan ulang !")
+    cancel()
+
+# function returnMenu sebagai pembatas untuk kembali ke menu awal
+
+
+def returnMenu():
+    input("Tekan ENTER untuk melanjutkan...\n")
+
+
+spotiplay(playlist)
